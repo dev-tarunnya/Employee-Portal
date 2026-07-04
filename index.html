@@ -1,0 +1,666 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Portal — Power Pages</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@200;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<body>
+
+<!-- Ambient background effects -->
+<div class="ambient-glow"></div>
+<div class="ambient-glow-2"></div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div style="text-align:center; margin-bottom:32px; position:relative; z-index:1;">
+      <div style="width:56px;height:56px;border-radius:14px;background:var(--accent-dim);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <i class="fa-solid fa-building" style="font-size:24px;color:var(--accent);"></i>
+      </div>
+      <h2 style="font-size:22px;font-weight:700;margin-bottom:4px;">Employee Portal</h2>
+      <p style="color:var(--fg-muted);font-size:14px;">Sign in with your Azure AD account</p>
+    </div>
+    <p style="font-size:12px;color:var(--fg-dim);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Select a role to simulate (Prototype)</p>
+    <div style="display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;">
+      <button class="login-role-btn" onclick="loginAs('employee')">
+        <div class="role-icon" style="background:var(--info-dim);color:var(--info);"><i class="fa-solid fa-user"></i></div>
+        <div><div style="font-weight:600;">Sarah Chen</div><div style="font-size:12px;color:var(--fg-muted);">Employee — Engineering</div></div>
+      </button>
+      <button class="login-role-btn" onclick="loginAs('manager')">
+        <div class="role-icon" style="background:var(--accent-dim);color:var(--accent);"><i class="fa-solid fa-user-tie"></i></div>
+        <div><div style="font-weight:600;">Marcus Rivera</div><div style="font-size:12px;color:var(--fg-muted);">Manager — Engineering</div></div>
+      </button>
+      <button class="login-role-btn" onclick="loginAs('hr')">
+        <div class="role-icon" style="background:var(--warning-dim);color:var(--warning);"><i class="fa-solid fa-shield-halved"></i></div>
+        <div><div style="font-weight:600;">Priya Sharma</div><div style="font-size:12px;color:var(--fg-muted);">HR Admin</div></div>
+      </button>
+    </div>
+    <p style="text-align:center;margin-top:20px;font-size:11px;color:var(--fg-dim);position:relative;z-index:1;">
+      <i class="fa-solid fa-lock" style="margin-right:4px;"></i> Secured  Design & Developed By <br/><a href="https://github.com/dev-tarunnya ">Tapos Chandra Das</a>  (version 2.03)
+    </p>
+  </div>
+</div>
+
+<!-- ==================== MAIN APP ==================== -->
+<div id="app">
+  <!-- Sidebar -->
+  <aside id="sidebar" role="navigation" aria-label="Main navigation">
+    <div style="padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+      <div style="width:36px;height:36px;border-radius:10px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;">
+        <i class="fa-solid fa-building" style="font-size:16px;color:var(--accent);"></i>
+      </div>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;">Employee Portal</div>
+        <div style="font-size:11px;color:var(--fg-dim);">Power Pages</div>
+      </div>
+    </div>
+
+    <nav style="flex:1;padding:12px 0;overflow-y:auto;">
+      <div style="padding:0 20px 8px;font-size:11px;color:var(--fg-dim);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Main</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+        <i class="fa-solid fa-grid-2"></i> Dashboard
+      </div>
+      <div class="nav-item" data-page="documents" onclick="navigateTo('documents')">
+        <i class="fa-solid fa-folder-open"></i> Documents
+      </div>
+      <div class="nav-item" data-page="leave" onclick="navigateTo('leave')">
+        <i class="fa-solid fa-calendar-check"></i> Leave Request
+      </div>
+      <div class="nav-item" data-page="payroll" onclick="navigateTo('payroll')">
+        <i class="fa-solid fa-money-check-dollar"></i> Payroll Forms
+      </div>
+
+      <div style="padding:16px 20px 8px;font-size:11px;color:var(--fg-dim);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Tracking</div>
+      <div class="nav-item" data-page="requests" onclick="navigateTo('requests')">
+        <i class="fa-solid fa-list-check"></i> My Requests
+        <span class="nav-badge" id="pending-badge" style="display:none;">0</span>
+      </div>
+      <div class="nav-item" data-page="approvals" onclick="navigateTo('approvals')" id="nav-approvals" style="display:none;">
+        <i class="fa-solid fa-clipboard-check"></i> Approvals
+        <span class="nav-badge" id="approval-badge">0</span>
+      </div>
+
+      <div style="padding:16px 20px 8px;font-size:11px;color:var(--fg-dim);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">Admin</div>
+      <div class="nav-item" data-page="permissions" onclick="navigateTo('permissions')" id="nav-permissions" style="display:none;">
+        <i class="fa-solid fa-user-shield"></i> Permissions
+      </div>
+      <div class="nav-item" data-page="handoff" onclick="navigateTo('handoff')" id="nav-handoff" style="display:none;">
+        <i class="fa-solid fa-video"></i> Handoff Guide
+      </div>
+    </nav>
+
+    <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+      <div id="user-avatar" style="width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;"></div>
+      <div style="flex:1;min-width:0;">
+        <div id="user-name" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+        <div id="user-role" style="font-size:11px;color:var(--fg-muted);"></div>
+      </div>
+      <button onclick="logout()" style="background:none;border:none;color:var(--fg-dim);cursor:pointer;padding:4px;" title="Sign out" aria-label="Sign out">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content area -->
+  <div id="main-content">
+    <!-- Top bar -->
+    <header id="topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button id="menu-toggle" onclick="toggleSidebar()" style="display:none;background:none;border:none;color:var(--fg);font-size:18px;cursor:pointer;" aria-label="Toggle menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h1 id="page-title" style="font-size:18px;font-weight:700;">Dashboard</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div style="position:relative;">
+          <input type="text" placeholder="Search..." class="form-input" style="width:220px;padding:8px 14px 8px 36px;font-size:13px;border-radius:20px;" aria-label="Search">
+          <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--fg-dim);font-size:13px;"></i>
+        </div>
+        <button style="background:none;border:none;color:var(--fg-muted);cursor:pointer;position:relative;font-size:16px;" aria-label="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--danger);border-radius:50;border:2px solid var(--bg-raised);border-radius:50%;"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ==================== DASHBOARD PAGE ==================== -->
+    <section class="page active" id="page-dashboard">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:28px;">
+        <div class="stat-card teal">
+          <div style="font-size:12px;color:var(--fg-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px;">Leave Balance</div>
+          <div style="font-size:32px;font-weight:900;font-family:'Space Grotesk',sans-serif;margin:6px 0 4px;">18<span style="font-size:16px;color:var(--fg-muted);font-weight:400;"> days</span></div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:75%;background:var(--accent);"></div></div>
+          <div style="font-size:11px;color:var(--fg-dim);margin-top:4px;">6 of 24 days used</div>
+        </div>
+        <div class="stat-card blue">
+          <div style="font-size:12px;color:var(--fg-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px;">Pending Requests</div>
+          <div style="font-size:32px;font-weight:900;font-family:'Space Grotesk',sans-serif;margin:6px 0;" id="dash-pending">2</div>
+          <div style="font-size:13px;color:var(--info);"><i class="fa-solid fa-clock" style="margin-right:4px;"></i>Awaiting approval</div>
+        </div>
+        <div class="stat-card orange">
+          <div style="font-size:12px;color:var(--fg-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px;">Approved (YTD)</div>
+          <div style="font-size:32px;font-weight:900;font-family:'Space Grotesk',sans-serif;margin:6px 0;">12</div>
+          <div style="font-size:13px;color:var(--warning);"><i class="fa-solid fa-check" style="margin-right:4px;"></i>Leave & payroll</div>
+        </div>
+        <div class="stat-card red">
+          <div style="font-size:12px;color:var(--fg-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px;">Rejected (YTD)</div>
+          <div style="font-size:32px;font-weight:900;font-family:'Space Grotesk',sans-serif;margin:6px 0;">1</div>
+          <div style="font-size:13px;color:var(--danger);"><i class="fa-solid fa-xmark" style="margin-right:4px;"></i>This year</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <h3 style="font-size:16px;font-weight:700;">Recent Requests</h3>
+            <button class="btn btn-secondary btn-sm" onclick="navigateTo('requests')">View All</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Type</th><th>Details</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="dash-recent-table"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:18px;">Quick Actions</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button class="btn btn-primary" style="justify-content:center;" onclick="navigateTo('leave')">
+              <i class="fa-solid fa-calendar-plus"></i> New Leave Request
+            </button>
+            <button class="btn btn-secondary" style="justify-content:center;" onclick="navigateTo('payroll')">
+              <i class="fa-solid fa-file-invoice-dollar"></i> Payroll Forms
+            </button>
+            <button class="btn btn-secondary" style="justify-content:center;" onclick="navigateTo('documents')">
+              <i class="fa-solid fa-upload"></i> Upload Document
+            </button>
+          </div>
+          <div style="margin-top:24px;padding:16px;background:var(--bg-raised);border-radius:8px;border:1px solid var(--border);">
+            <div style="font-size:12px;color:var(--fg-muted);font-weight:600;text-transform:uppercase;margin-bottom:8px;">Leave Usage Breakdown</div>
+            <div style="display:flex;flex-direction:column;gap:10px;" id="leave-breakdown"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DOCUMENTS PAGE ==================== -->
+    <section class="page" id="page-documents">
+      <div style="display:grid;grid-template-columns:260px 1fr;gap:24px;">
+        <!-- Folder tree -->
+        <div class="card" style="padding:16px;height:fit-content;">
+          <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;padding:0 8px;">Folders</h3>
+          <div id="folder-tree"></div>
+        </div>
+        <!-- File listing -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+            <h3 style="font-size:16px;font-weight:700;" id="current-folder-title">Company Policies</h3>
+            <button class="btn btn-primary btn-sm" onclick="showUploadModal()">
+              <i class="fa-solid fa-plus"></i> Upload File
+            </button>
+          </div>
+          <!-- Drop zone -->
+          <div class="drop-zone" id="drop-zone" style="margin-bottom:20px;">
+            <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div style="font-size:15px;font-weight:600;margin-bottom:4px;">Drag and drop files here</div>
+            <div style="font-size:13px;color:var(--fg-muted);">or click to browse — PDF, DOCX, XLSX, PNG up to 25MB</div>
+            <input type="file" id="file-input" multiple style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+          </div>
+          <div id="file-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LEAVE REQUEST PAGE ==================== -->
+    <section class="page" id="page-leave">
+      <div style="max-width:720px;">
+        <div class="steps" id="leave-steps">
+          <div class="step active" data-step="1"><div class="step-num">1</div><div style="font-size:12px;color:var(--fg-muted);">Leave Type</div></div>
+          <div class="step" data-step="2"><div class="step-num">2</div><div style="font-size:12px;color:var(--fg-muted);">Dates</div></div>
+          <div class="step" data-step="3"><div class="step-num">3</div><div style="font-size:12px;color:var(--fg-muted);">Review</div></div>
+        </div>
+        <!-- Step 1 -->
+        <div class="card leave-step" id="leave-step-1">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">Select Leave Type</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="leave-type-grid"></div>
+          <div class="error-msg" id="err-leave-type">Please select a leave type</div>
+          <div style="margin-top:24px;display:flex;justify-content:flex-end;">
+            <button class="btn btn-primary" onclick="leaveNext(2)">Continue <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+        <!-- Step 2 -->
+        <div class="card leave-step" id="leave-step-2" style="display:none;">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">Choose Dates</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-input" id="leave-start" onchange="calcLeaveDays()">
+              <div class="error-msg" id="err-leave-start">Start date is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" class="form-input" id="leave-end" onchange="calcLeaveDays()">
+              <div class="error-msg" id="err-leave-end">End date is required</div>
+            </div>
+          </div>
+          <div id="leave-days-summary" style="display:none;padding:14px 18px;background:var(--accent-dim);border-radius:8px;margin-bottom:16px;border:1px solid rgba(0,201,167,0.2);">
+            <span style="font-weight:600;color:var(--accent);" id="leave-days-count"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reason / Notes</label>
+            <textarea class="form-textarea" id="leave-reason" placeholder="Optional — provide any context for your leave request..."></textarea>
+          </div>
+          <div class="error-msg" id="err-leave-dates">Invalid date range</div>
+          <div style="margin-top:8px;display:flex;justify-content:space-between;">
+            <button class="btn btn-secondary" onclick="leaveNext(1)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button class="btn btn-primary" onclick="leaveNext(3)">Review <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+        <!-- Step 3 -->
+        <div class="card leave-step" id="leave-step-3" style="display:none;">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">Review & Submit</h3>
+          <div id="leave-review" style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;"></div>
+          <div style="padding:14px 18px;background:var(--warning-dim);border-radius:8px;border:1px solid rgba(255,179,71,0.2);margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--warning);">
+              <i class="fa-solid fa-info-circle"></i>
+              <span>Submitting will trigger an approval workflow. You'll receive an email notification once a decision is made.</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <button class="btn btn-secondary" onclick="leaveNext(2)"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <button class="btn btn-primary" onclick="submitLeave()" id="leave-submit-btn">
+              <i class="fa-solid fa-paper-plane"></i> Submit to Dataverse
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PAYROLL FORMS PAGE ==================== -->
+    <section class="page" id="page-payroll">
+      <div class="tab-bar" id="payroll-tabs">
+        <button class="tab-btn active" data-tab="payslip" onclick="switchPayrollTab('payslip')">Payslip Correction</button>
+        <button class="tab-btn" data-tab="tax" onclick="switchPayrollTab('tax')">Tax Declaration</button>
+        <button class="tab-btn" data-tab="expense" onclick="switchPayrollTab('expense')">Expense Claim</button>
+        <button class="tab-btn" data-tab="bank" onclick="switchPayrollTab('bank')">Bank Details Update</button>
+      </div>
+
+      <!-- Payslip Correction -->
+      <div class="payroll-tab active" id="tab-payslip" style="max-width:680px;">
+        <div class="card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;">Payslip Correction Request</h3>
+          <p style="font-size:13px;color:var(--fg-muted);margin-bottom:24px;">Use this form to report discrepancies in your latest payslip.</p>
+          <div class="form-group">
+            <label class="form-label">Pay Period</label>
+            <select class="form-select" id="pay-period">
+              <option value="">Select pay period...</option>
+              <option>January 2025</option>
+              <option>December 2024</option>
+              <option>November 2024</option>
+            </select>
+            <div class="error-msg" id="err-pay-period">Please select a pay period</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Correction Type</label>
+            <select class="form-select" id="correction-type">
+              <option value="">Select type...</option>
+              <option>Missing hours</option>
+              <option>Incorrect overtime rate</option>
+              <option>Wrong tax deduction</option>
+              <option>Missing bonus/commission</option>
+              <option>Other</option>
+            </select>
+            <div class="error-msg" id="err-correction-type">Please select a correction type</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Expected Amount ($)</label>
+              <input type="number" class="form-input" id="expected-amount" placeholder="0.00" step="0.01">
+              <div class="error-msg" id="err-expected-amount">Enter a valid amount</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Actual Amount ($)</label>
+              <input type="number" class="form-input" id="actual-amount" placeholder="0.00" step="0.01">
+              <div class="error-msg" id="err-actual-amount">Enter a valid amount</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="pay-description" placeholder="Describe the discrepancy in detail..."></textarea>
+            <div class="error-msg" id="err-pay-description">Please provide a description</div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-secondary" onclick="clearPayrollForm('payslip')">Clear</button>
+            <button class="btn btn-primary" onclick="submitPayrollForm('payslip')"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tax Declaration -->
+      <div class="payroll-tab" id="tab-tax" style="max-width:680px;display:none;">
+        <div class="card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;">Tax Declaration Update</h3>
+          <p style="font-size:13px;color:var(--fg-muted);margin-bottom:24px;">Update your tax file number or residency status for payroll processing.</p>
+          <div class="form-group">
+            <label class="form-label">Tax File Number</label>
+            <input type="text" class="form-input" id="tfn-input" placeholder="XXX XXX XXX" maxlength="11">
+            <div class="error-msg" id="err-tfn">Enter a valid TFN (9 digits)</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Residency Status</label>
+            <select class="form-select" id="residency-status">
+              <option value="">Select status...</option>
+              <option>Australian Resident</option>
+              <option>Foreign Resident</option>
+              <option>Working Holiday Maker</option>
+            </select>
+            <div class="error-msg" id="err-residency">Please select your residency status</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tax-Free Threshold Claim</label>
+            <select class="form-select" id="tft-claim">
+              <option value="">Select...</option>
+              <option>Yes — I claim the tax-free threshold</option>
+              <option>No — I do not claim the tax-free threshold</option>
+            </select>
+            <div class="error-msg" id="err-tft">Please make a selection</div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-secondary" onclick="clearPayrollForm('tax')">Clear</button>
+            <button class="btn btn-primary" onclick="submitPayrollForm('tax')"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expense Claim -->
+      <div class="payroll-tab" id="tab-expense" style="max-width:680px;display:none;">
+        <div class="card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;">Expense Claim</h3>
+          <p style="font-size:13px;color:var(--fg-muted);margin-bottom:24px;">Submit work-related expenses for reimbursement.</p>
+          <div class="form-group">
+            <label class="form-label">Expense Category</label>
+            <select class="form-select" id="expense-category">
+              <option value="">Select category...</option>
+              <option>Travel — Flights</option>
+              <option>Travel — Accommodation</option>
+              <option>Travel — Meals</option>
+              <option>Office Supplies</option>
+              <option>Software / Tools</option>
+              <option>Professional Development</option>
+              <option>Other</option>
+            </select>
+            <div class="error-msg" id="err-expense-cat">Please select a category</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Expense Date</label>
+              <input type="date" class="form-input" id="expense-date">
+              <div class="error-msg" id="err-expense-date">Date is required</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount ($)</label>
+              <input type="number" class="form-input" id="expense-amount" placeholder="0.00" step="0.01">
+              <div class="error-msg" id="err-expense-amount">Enter a valid amount</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="expense-desc" placeholder="Describe the expense..."></textarea>
+            <div class="error-msg" id="err-expense-desc">Please provide a description</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Receipt (Upload)</label>
+            <div class="drop-zone" id="receipt-drop" style="padding:24px;">
+              <i class="fa-solid fa-receipt" style="font-size:24px;color:var(--fg-dim);margin-bottom:6px;display:block;"></i>
+              <div style="font-size:13px;color:var(--fg-muted);">Drop receipt image or PDF here</div>
+              <input type="file" id="receipt-input" style="display:none;" accept=".pdf,.png,.jpg,.jpeg">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-secondary" onclick="clearPayrollForm('expense')">Clear</button>
+            <button class="btn btn-primary" onclick="submitPayrollForm('expense')"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Details -->
+      <div class="payroll-tab" id="tab-bank" style="max-width:680px;display:none;">
+        <div class="card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;">Bank Details Update</h3>
+          <p style="font-size:13px;color:var(--fg-muted);margin-bottom:24px;">Update your bank account for salary deposits. Changes require HR approval.</p>
+          <div class="form-group">
+            <label class="form-label">Bank Name</label>
+            <input type="text" class="form-input" id="bank-name" placeholder="e.g. Commonwealth Bank">
+            <div class="error-msg" id="err-bank-name">Bank name is required</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">BSB</label>
+              <input type="text" class="form-input" id="bank-bsb" placeholder="XXX-XXX" maxlength="7">
+              <div class="error-msg" id="err-bank-bsb">Enter a valid BSB (6 digits)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account Number</label>
+              <input type="text" class="form-input" id="bank-account" placeholder="XXXXXXX" maxlength="10">
+              <div class="error-msg" id="err-bank-account">Enter a valid account number</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Account Name</label>
+            <input type="text" class="form-input" id="bank-accname" placeholder="Name on the account">
+            <div class="error-msg" id="err-bank-accname">Account name is required</div>
+          </div>
+          <div style="padding:14px 18px;background:var(--danger-dim);border-radius:8px;border:1px solid rgba(255,107,107,0.2);margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--danger);">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Bank detail changes are security-sensitive and will be verified by HR before processing.</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <button class="btn btn-secondary" onclick="clearPayrollForm('bank')">Clear</button>
+            <button class="btn btn-primary" onclick="submitPayrollForm('bank')"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MY REQUESTS PAGE ==================== -->
+    <section class="page" id="page-requests">
+      <div class="card" style="margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <h3 style="font-size:16px;font-weight:700;">All My Requests</h3>
+          <div style="display:flex;gap:8px;">
+            <select class="form-select" id="filter-type" style="width:160px;padding:8px 12px;font-size:13px;" onchange="renderRequests()">
+              <option value="all">All Types</option>
+              <option value="leave">Leave</option>
+              <option value="payroll">Payroll</option>
+            </select>
+            <select class="form-select" id="filter-status" style="width:140px;padding:8px 12px;font-size:13px;" onchange="renderRequests()">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>Type</th><th>Details</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="requests-table"></tbody>
+        </table>
+        <div id="no-requests" style="text-align:center;padding:40px;color:var(--fg-dim);display:none;">
+          <i class="fa-solid fa-inbox" style="font-size:32px;margin-bottom:10px;display:block;"></i>
+          No requests found matching your filters.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== APPROVALS PAGE (Manager/HR only) ==================== -->
+    <section class="page" id="page-approvals">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <h3 style="font-size:16px;font-weight:700;">Pending Approvals</h3>
+          <p style="font-size:13px;color:var(--fg-muted);">Review and action items submitted by your team</p>
+        </div>
+      </div>
+      <div id="approvals-list" style="display:grid;gap:14px;"></div>
+      <div id="no-approvals" style="text-align:center;padding:60px;color:var(--fg-dim);display:none;">
+        <i class="fa-solid fa-check-double" style="font-size:40px;margin-bottom:12px;display:block;color:var(--success);"></i>
+        All caught up — no pending approvals.
+      </div>
+    </section>
+
+    <!-- ==================== PERMISSIONS PAGE (HR only) ==================== -->
+    <section class="page" id="page-permissions">
+      <div style="max-width:900px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div>
+            <h3 style="font-size:16px;font-weight:700;">Role-Based Permissions</h3>
+            <p style="font-size:13px;color:var(--fg-muted);">Configure which folders and forms each role can access</p>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:20px;">
+          <h4 style="font-size:14px;font-weight:700;margin-bottom:16px;">Document Folder Access</h4>
+          <table class="data-table">
+            <thead><tr><th>Folder</th><th>Employee</th><th>Manager</th><th>HR Admin</th></tr></thead>
+            <tbody id="perm-folder-table"></tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-bottom:20px;">
+          <h4 style="font-size:14px;font-weight:700;margin-bottom:16px;">Form Access</h4>
+          <table class="data-table">
+            <thead><tr><th>Form</th><th>Employee</th><th>Manager</th><th>HR Admin</th></tr></thead>
+            <tbody id="perm-form-table"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h4 style="font-size:14px;font-weight:700;margin-bottom:16px;">How Permissions Work in Power Pages</h4>
+          <div style="font-size:13px;color:var(--fg-muted);line-height:1.7;">
+            <p style="margin-bottom:10px;">Permissions in this portal are enforced at two layers:</p>
+            <ol style="padding-left:20px;display:flex;flex-direction:column;gap:6px;">
+              <li><strong style="color:var(--fg);">Power Pages Web Roles</strong> — Map Azure AD security groups to Power Pages web roles. Each role gets a different table filter on the Dataverse folder/table permissions.</li>
+              <li><strong style="color:var(--fg);">Dataverse Row-Level Security</strong> — Use the <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;">Access Team</code> or ownership-based RLS so users only see rows they're permitted to access, even if the UI changes.</li>
+              <li><strong style="color:var(--fg);">Power Automate Approval</strong> — Approval flows check the requester's manager from Azure AD and route accordingly. HR forms route to the HR group.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== HANDOFF GUIDE PAGE ==================== -->
+    <section class="page" id="page-handoff">
+      <div style="max-width:760px;">
+        <div style="margin-bottom:28px;">
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:6px;">Handoff Guide</h3>
+          <p style="font-size:14px;color:var(--fg-muted);">How to add new forms and change user permissions in this Power Pages solution.</p>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <h4 style="font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-plus-circle" style="color:var(--accent);"></i> Adding a New Form
+          </h4>
+          <div class="handoff-step">
+            <div class="step-circle">1</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Create a Dataverse Table</div>
+              <div style="font-size:13px;color:var(--fg-muted);line-height:1.6;">In your Power Platform environment, create a new table (e.g. <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;">pnp_TravelRequest</code>). Add columns for each form field. Include a <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;">Status</code> choice column (Draft, Pending, Approved, Rejected) and a <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;">pnp_Requester</code> lookup to the User table.</div>
+            </div>
+          </div>
+          <div class="handoff-step">
+            <div class="step-circle">2</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Add a Power Pages Form</div>
+              <div style="font-size:13px;color:var(--fg-muted);line-height:1.6;">In the Power Pages Studio, go to <strong style="color:var(--fg);">Data &gt; Forms</strong>, click <strong style="color:var(--fg);">Add Form</strong>, select your new table, and choose "Create new form." Place it on a new or existing webpage. Set the form mode to "Create" for submissions.</div>
+            </div>
+          </div>
+          <div class="handoff-step">
+            <div class="step-circle">3</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Configure the Approval Flow</div>
+              <div style="font-size:13px;color:var(--fg-muted);line-height:1.6;">In Power Automate, create a new flow triggered by <strong style="color:var(--fg);">"When a row is added"</strong> on your Dataverse table. Add an <strong style="color:var(--fg);">Approval</strong> action assigned to the requester's manager (use "Get manager (V2)" connector). On approval/rejection, update the Dataverse row status and send an email notification.</div>
+            </div>
+          </div>
+          <div class="handoff-step">
+            <div class="step-circle">4</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Add Navigation & Permissions</div>
+              <div style="font-size:13px;color:var(--fg-muted);line-height:1.6;">Add a link in the Power Pages sidebar (or in this prototype's <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;">navigateTo()</code> function). Then go to <strong style="color:var(--fg);">Security &gt; Web Roles</strong>, edit the appropriate roles, and under <strong style="color:var(--fg);">Table Permissions</strong>, grant Create/Read access to the new table for the right roles.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <h4 style="font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-user-shield" style="color:var(--warning);"></i> Changing User Permissions
+          </h4>
+          <div class="handoff-step">
+            <div class="step-circle" style="background:var(--warning-dim);color:var(--warning);">1</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Map Azure AD Groups to Web Roles</div>
+              <div style="font-size:13px;color:var(--fg-muted);line-height:1.6;">Go to <strong style="color:var(--fg);">Security &gt; Web Roles</strong>. Each web role (e.g. "Employee", "Manager", "HR Admin") should be linked to an Azure AD security group via the <strong style="color:var(--fg);">Identity Providers</strong> configuration. To change a user's role, add/remove them from the Azure AD group — changes sync automatically.</div>
+            </div>
+          </div>
+          <div class="handoff-step">
+            <div class="step-circle" style="background:var(--warning-dim);color:var(--warning);">2</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Adjust Table Permissions per Role</div>
+              <div style="font-size:13px;color:var(--fg-muted);line-height:1.6;">Under each web role, click <strong style="color:var(--fg);">Table Permissions</strong>. For document folders, use <strong style="color:var(--fg);">Filter rows</strong> to restrict which rows a role can see — e.g. filter by <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;">pnp_FolderAccessRole</code> column. This is how employees only see their department's folders while HR sees all.</div>
+            </div>
+          </div>
+          <div class="handoff-step">
+            <div class="step-circle" style="background:var(--warning-dim);color:var(--warning);">3</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Control Page Visibility</div>
+              <div style="font-size:13px;color:var(--fg-muted);line-height:1.6;">In Power Pages Studio, select a webpage, go to <strong style="color:var(--fg);">Properties &gt; Permissions</strong>, and restrict which web roles can view it. Pages like "Approvals" should only be visible to Managers and HR; "Permissions" only to HR. This is the equivalent of the <code style="background:var(--bg-hover);padding:2px 6px;border-radius:4px;">style="display:none"</code> logic in this prototype.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:var(--accent);border-width:1px;">
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="width:44px;height:44px;border-radius:10px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fa-solid fa-video" style="color:var(--accent);font-size:18px;"></i>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:15px;margin-bottom:4px;">Handoff Video</div>
+              <div style="font-size:13px;color:var(--fg-muted);line-height:1.6;">A recorded walkthrough video will accompany this prototype, demonstrating each step above in a live Power Pages environment — from creating a new Dataverse table to configuring the approval flow and testing with different user roles. The video will be delivered as an unlisted YouTube link or MP4 file.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <h3 style="font-size:16px;font-weight:700;">Upload Files</h3>
+      <button onclick="closeUploadModal()" style="background:none;border:none;color:var(--fg-muted);cursor:pointer;font-size:18px;" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="drop-zone" id="modal-drop-zone" style="padding:32px;margin-bottom:16px;">
+      <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Drag files here or click to browse</div>
+      <div style="font-size:12px;color:var(--fg-muted);">PDF, DOCX, XLSX, PNG up to 25MB</div>
+      <input type="file" id="modal-file-input" multiple style="display:none;" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+    </div>
+    <div id="upload-queue" style="max-height:200px;overflow-y:auto;margin-bottom:16px;"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+      <button class="btn btn-primary" id="upload-confirm-btn" onclick="confirmUpload()" style="display:none;">
+        <i class="fa-solid fa-upload"></i> Upload <span id="upload-count"></span> file(s)
+      </button>
+    </div>
+  </div>
+</div>
+<script src="js/test.js"></script>
+</body>
+</html>
